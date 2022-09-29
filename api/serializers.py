@@ -6,10 +6,6 @@ class UserSerializer(ModelSerializer):
         model = CustomUserModel
         fields = ("username", "first_name", "last_name", "email", "mt5_login", "mt5_password", "mt5_server")
 
-class ActiveUsersSerializer(ModelSerializer):
-    class Meta:
-        model = CustomUserModel
-        fields = ("id", "username", "mt5_login", "mt5_password", "mt5_server", "bots")
 
 class BotSerializer(ModelSerializer):
     class Meta:
@@ -20,3 +16,9 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model = OrderModel
         fields = "__all__"
+
+class ActiveUsersSerializer(ModelSerializer):
+    bots =  BotSerializer(many=True)
+    class Meta:
+        model = CustomUserModel
+        fields = ("id", "username", "mt5_login", "mt5_password", "mt5_server", "bots")
