@@ -7,14 +7,16 @@ class UserSerializer(ModelSerializer):
         fields = ("username", "first_name", "last_name", "email", "mt5_login", "mt5_password", "mt5_server")
 
 
-class BotSerializer(ModelSerializer):
-    class Meta:
-        model = BotModel
-        fields = "__all__"
         
 class OrderSerializer(ModelSerializer):
     class Meta:
         model = OrderModel
+        fields = "__all__"
+
+class BotSerializer(ModelSerializer):
+    orders = OrderSerializer(many=True)
+    class Meta:
+        model = BotModel
         fields = "__all__"
 
 class ActiveUsersSerializer(ModelSerializer):
