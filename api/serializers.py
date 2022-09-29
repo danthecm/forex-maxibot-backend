@@ -9,7 +9,7 @@ class UserSerializer(ModelSerializer):
 class ActiveUsersSerializer(ModelSerializer):
     class Meta:
         model = CustomUserModel
-        fields = ("id", "username", "mt5_login", "mt5_password", "mt5_server")
+        fields = ("id", "username", "mt5_login", "mt5_password", "mt5_server", "bots")
 
 class BotSerializer(ModelSerializer):
     class Meta:
