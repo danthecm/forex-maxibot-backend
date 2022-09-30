@@ -14,7 +14,7 @@ class OrderSerializer(ModelSerializer):
         fields = "__all__"
 
 class BotSerializer(ModelSerializer):
-    orders = OrderSerializer(many=True)
+    orders = OrderSerializer(many=True, read_only=True)
     class Meta:
         model = BotModel
         fields = "__all__"
