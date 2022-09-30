@@ -25,7 +25,7 @@ class BotModel(models.Model):
 
 class OrderModel(models.Model):
     bot = models.ForeignKey(BotModel, related_name="orders", on_delete=models.CASCADE)
-    order_id = models.CharField(max_length=100, default="23435232")
+    order_id = models.CharField(max_length=100)
     symbol = models.CharField(max_length=200)
     volume = models.DecimalField(decimal_places=2, max_digits=4)
     type = models.CharField(max_length=10, choices=(("buy", "buy"), ("sell", "sell")))
