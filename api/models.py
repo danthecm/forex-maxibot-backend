@@ -28,7 +28,6 @@ class OrderModel(models.Model):
     bot = models.ForeignKey(BotModel, related_name="orders", on_delete=models.CASCADE)
     order_id = models.CharField(max_length=100)
     price = models.DecimalField(decimal_places=5, max_digits=5)
-    volume = models.DecimalField(decimal_places=2, max_digits=4)
     type = models.CharField(max_length=10, choices=(("buy", "buy"), ("sell", "sell")))
     take_profit = models.DecimalField(decimal_places=5, max_digits=5)
     status = models.CharField(max_length=100)
