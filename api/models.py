@@ -1,5 +1,6 @@
 from email.policy import default
 from random import choices
+from unicodedata import decimal
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -26,11 +27,10 @@ class BotModel(models.Model):
 class OrderModel(models.Model):
     bot = models.ForeignKey(BotModel, related_name="orders", on_delete=models.CASCADE)
     order_id = models.CharField(max_length=100)
-    symbol = models.CharField(max_length=200)
+    price = models.DecimalField(decimal_places=4, max_digits=5, default="0.0004")
     volume = models.DecimalField(decimal_places=2, max_digits=4)
     type = models.CharField(max_length=10, choices=(("buy", "buy"), ("sell", "sell")))
-    grid_interval = models.IntegerField()
-    take_profit = models.IntegerField()
+    take_profit = models.DecimalField(decimal_places=4, max_digits=5, default="0.0004")
     status = models.CharField(max_length=100)
     
     def __str__(self):
