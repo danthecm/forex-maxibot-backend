@@ -20,6 +20,8 @@ class BotModel(models.Model):
     grid_interval = models.IntegerField()
     take_profit = models.IntegerField()
     status = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return self.symbol
@@ -31,6 +33,8 @@ class OrderModel(models.Model):
     type = models.CharField(max_length=10, choices=(("buy", "buy"), ("sell", "sell")))
     take_profit = models.DecimalField(decimal_places=5, max_digits=5)
     status = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return self.type
