@@ -7,6 +7,9 @@ class TradeProfileSerializer(serializers.ModelSerializer):
         model = TradeProfile
         fields = "__all__"
 
+class SendVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
 class UserSerializer(serializers.ModelSerializer):
     trade_profile = TradeProfileSerializer(read_only=True)
     class Meta:

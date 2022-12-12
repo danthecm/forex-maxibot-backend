@@ -9,7 +9,8 @@ from .serializers import (
     UserSerializer, BotSerializer, 
     OrderSerializer, ActiveUsersSerializer, 
     RegisteriatonSerializer, LoginSerializer,
-    TradeProfileSerializer, TradeProfile
+    TradeProfileSerializer, TradeProfile,
+    SendVerificationSerializer
 )
 from django.contrib.sites.shortcuts import get_current_site
 from helpers.send_mail import send_verification
@@ -113,6 +114,13 @@ class ActiveUsersViewSet(ViewSet):
         serializer = ActiveUsersSerializer(queryset, many=True)
         return Response(serializer.data)
 
+class SendVerificationViewSet(ViewSet):
+    queryset = User.objects.all()
+    serializer_class = SendVerificationSerializer
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
 class VerifyViewSet(ViewSet):
     queryset = User.objects.all()
