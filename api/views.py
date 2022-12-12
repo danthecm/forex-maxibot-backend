@@ -14,11 +14,10 @@ from .serializers import (
 )
 from django.contrib.sites.shortcuts import get_current_site
 from helpers.send_mail import send_verification
+from helpers.verification import generate_code
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import authenticate
-import random
-import string
 
 # Create your views here.
 
@@ -46,18 +45,16 @@ class RegisterationViewSet(ModelViewSet):
         )
         user.set_password(password)
         base_url = get_current_site(request).domain
-        verificiation_code = ''.join(random.choices(string.digits, k=6))
-        user.verification_code = verificiation_code
-        verify_url = f"http://{base_url}/verify/{user.id}/?code={verificiation_code}"
-        print(verify_url)
-        name = user.get_full_name if user.get_full_name else "New User"
+        verify_url, code = generate_code(base_url, user.id)
+        user.verification_code = code
+        name = user.get_full_name
         verification_email = send_verification(name=name,
                                                     email=email, url=verify_url)
         print("email verification", verification_email)
         if verification_email != "success":
             return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         user.save()
-        print(f"HEllo {email} Your verification_code is: ", verificiation_code)
+        print(f"HEllo {email} Your verification_code is: ", code)
         refresh_token = RefreshToken.for_user(user)
         access_token = refresh_token.access_token
         response = {
@@ -121,6 +118,26 @@ class SendVerificationViewSet(ViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data.get("email")
+        user = self.queryset.filter(email=email)
+        print("the found user is ", user)
+
+        if user is None:
+            return Response({"detail": "user with this email does not exist"}, status=status.HTTP_404_NOT_FOUND) 
+
+        base_url = get_current_site(request).domain
+        name = user.get_full_name
+        verify_url, code = generate_code(base_url, user.id)
+        user.verification_code = code
+        verification_email = send_verification(name=name,
+                                                    email=email, url=verify_url)
+        print("email verification", verification_email)
+        if verification_email != "success":
+            return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({"detail": "email successfully sent"}, status=status.HTTP_202_ACCEPTED)
+
+
 
 class VerifyViewSet(ViewSet):
     queryset = User.objects.all()
