@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
     'api'
 ]
 
@@ -72,12 +73,36 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'forex_bot_api.wsgi.application'
 
+AUTH_USER_MODEL = 'api.User'
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+
+}
+
+# SEND GRID CONFIGURATIONS
+# SENDGRID_API_KEY = config("SENDGRID_API_KEY")
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER ='themaxibot1@gmail.com'
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = 'themaxibot1@gmail.com'
+
+DEFAULT_FROM_EMAIL = 'support@themaxibot.com'
+
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DB_NAME = "arlnjokn"
-DB_HOST = "tyke.db.elephantsql.com"
+DB_NAME = "shqirlby"
+DB_HOST = "mahmud.db.elephantsql.com"
 DB_PORT = "5432"
 
 
