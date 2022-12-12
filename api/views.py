@@ -13,6 +13,7 @@ from .serializers import (
     SendVerificationSerializer
 )
 from django.contrib.sites.shortcuts import get_current_site
+from django.shortcuts import get_object_or_404
 from helpers.send_mail import send_verification
 from helpers.verification import generate_code
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -120,7 +121,7 @@ class SendVerificationViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
 
         email = serializer.validated_data.get("email")
-        user = self.queryset.filter(email=email)
+        user = get_object_or_404(self.queryset, email=email)
         print("the found user is ", user)
 
         if user is None:
@@ -133,8 +134,11 @@ class SendVerificationViewSet(ViewSet):
         verification_email = send_verification(name=name,
                                                     email=email, url=verify_url)
         print("email verification", verification_email)
+
         if verification_email != "success":
             return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        user.save()
         return Response({"detail": "email successfully sent"}, status=status.HTTP_202_ACCEPTED)
 
 
@@ -147,9 +151,7 @@ class VerifyViewSet(ViewSet):
         code = request.query_params.get("code")
         if code is None:
             return Response({"message": "You must send a code parameter in your request"}, status=status.HTTP_400_BAD_REQUEST)
-        user = self.queryset.filter(pk=pk).first()
-        if user is None:
-            return Response({"message": "User not Found"}, status=status.HTTP_404_NOT_FOUND)
+        user = get_object_or_404(self.queryset, id=pk)
         if user.is_verified:
             return Response({"message": "Email Already Verified"}, status=status.HTTP_200_OK)
         code = int(code)
