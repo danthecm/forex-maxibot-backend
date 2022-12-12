@@ -34,10 +34,11 @@ class BotSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ActiveUsersSerializer(serializers.ModelSerializer):
-    bots =  BotSerializer(many=True)
+    trade_profile = TradeProfileSerializer(read_only=True)
     class Meta:
         model = User
-        fields = ("id", "username", "mt5_login", "mt5_password", "mt5_server", "bots")
+        exclude = ("password",)
+        
 
 class VerifySerializer(serializers.Serializer):
     code = serializers.IntegerField()
