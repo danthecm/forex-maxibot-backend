@@ -23,10 +23,9 @@ from django.contrib.auth import authenticate
 # Create your views here.
 
 
-class RegisterationViewSet(ModelViewSet):
+class RegisterationViewSet(ViewSet):
     queryset = User.objects.all()
     serializer_class = RegisteriatonSerializer
-    http_method_names = ("post")
 
     def create(self, request):
         # Custom create logic

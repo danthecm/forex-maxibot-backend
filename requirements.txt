@@ -1,8 +1,9 @@
+cryptography==38.0.4
 Django==4.1.4
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.2
+drf-yasg==1.21.4
 psycopg2-binary==2.9.5
 python-decouple==3.6
-djangorestframework-simplejwt==5.2.2
 PyJWT==2.6.0
-cryptography==38.0.4
 sendgrid==6.9.7
