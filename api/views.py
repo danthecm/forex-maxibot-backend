@@ -82,7 +82,7 @@ class LoginViewSet(ViewSet):
       raise AuthenticationFailed('Invalid username or password')
     
     elif user.is_verified is False:
-        raise NotAcceptable("You must verify your account to login")
+        raise NotAcceptable("Please verify your email to continue.")
 
     refresh = RefreshToken.for_user(user)
 
