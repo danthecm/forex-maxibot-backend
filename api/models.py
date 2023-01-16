@@ -1,6 +1,8 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth import hashers
+from helpers.generate_key import generate_api_key
 
 
 class CustomUserManager(BaseUserManager):
@@ -76,11 +78,9 @@ class APIKEYModel(models.Model):
     @classmethod
     def create(cls, **kwargs) -> None:
         print("Create method called")
-        name = kwargs.get("name")
-        user = kwargs.get("user")
-        print(name, user)
+        raw_key, harsed_key = generate_api_key()
         api_key = cls(**kwargs)
-        return api_key
+        return raw_key
         
 
 class TradeProfile(models.Model):
