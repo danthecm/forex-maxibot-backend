@@ -6,7 +6,7 @@ from .models import APIKEYModel, User
 class APIKEYAuthentication(BaseAuthentication):
     def authenticate(self, request):
         api_key = request.META.get('HTTP_API_KEY')
-        print("The entered api key is", api_key)
-        my_key = APIKEYModel.create()
-        print(my_key.key, my_key.name, my_key.user)
-        raise AuthenticationFailed('Username not found, for the specified app')
+        my_key = APIKEYModel.verify(api_key)
+        if not my_key:
+            raise AuthenticationFailed('Invalid API Key for the specified app')
+        return (my_key.user, None)

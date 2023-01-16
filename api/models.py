@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth import hashers
-from helpers.generate_key import generate_api_key
+from helpers.api_key import generate_api_key, verify_api_key
 
 
 class CustomUserManager(BaseUserManager):
@@ -79,8 +79,24 @@ class APIKEYModel(models.Model):
     def create(cls, **kwargs) -> None:
         print("Create method called")
         raw_key, harsed_key = generate_api_key()
+        kwargs["user"] = User.objects.filter(id=14).first()
         api_key = cls(**kwargs)
+        api_key.key = harsed_key
+        api_key.save()
         return raw_key
+    
+    @classmethod
+    def verify(cls, raw_key):
+        all_keys = cls.objects.all()
+        for api_key in all_keys:
+            if verify_api_key(raw_key, api_key.key):
+                return api_key
+        return None
+
+    def __str__(self) -> str:
+        return self.user.username
+
+
         
 
 class TradeProfile(models.Model):

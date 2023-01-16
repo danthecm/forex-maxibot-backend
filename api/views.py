@@ -108,8 +108,7 @@ class ActiveUsersViewSet(ViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def list(self, request):
-        print(request.user)
-        queryset = User.objects.all()
+        queryset = User.objects.filter(is_verified=True)
         serializer = ActiveUsersSerializer(queryset, many=True)
         return Response(serializer.data)
 
