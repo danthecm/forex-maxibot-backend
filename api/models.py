@@ -67,6 +67,22 @@ class User(AbstractBaseUser):
         return True
 
 
+class APIKEYModel(models.Model):
+    user = models.OneToOneField(
+        User, related_name="api_key", on_delete=models.CASCADE)
+    key = models.CharField(max_length=225)
+    name = models.CharField(max_length=100, null=True, blank=True)
+
+    @classmethod
+    def create(cls, **kwargs) -> None:
+        print("Create method called")
+        name = kwargs.get("name")
+        user = kwargs.get("user")
+        print(name, user)
+        api_key = cls(**kwargs)
+        return api_key
+        
+
 class TradeProfile(models.Model):
     user = models.OneToOneField(
         User, related_name="trade_profile", on_delete=models.CASCADE)

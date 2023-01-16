@@ -5,7 +5,6 @@ from rest_framework.exceptions import AuthenticationFailed, NotAcceptable
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .auth import APIKEYAuthentication
-from rest_framework_api_key.permissions import HasAPIKey
 from .serializers import (
     User, BotModel, OrderModel,
     UserSerializer, BotSerializer, 
@@ -101,11 +100,11 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     http_method_names = ("get", "put", "patch", "delete")
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated | HasAPIKey]
+    permission_classes = [IsAuthenticated]
 
 
 class ActiveUsersViewSet(ViewSet):
-    authentication_classes = [JWTAuthentication | APIKEYAuthentication]
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def list(self, request):
@@ -171,17 +170,17 @@ class BotViewSet(ModelViewSet):
     queryset = BotModel.objects.all()
     serializer_class = BotSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated | HasAPIKey]
+    permission_classes = [IsAuthenticated]
 
 
 class OrderViewSet(ModelViewSet):
     queryset = OrderModel.objects.all()
     serializer_class = OrderSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated | HasAPIKey]
+    permission_classes = [IsAuthenticated]
 
 class TradeProfileViewSet(ModelViewSet):
     queryset = TradeProfile.objects.all()
     serializer_class = TradeProfileSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated | HasAPIKey]
+    permission_classes = [IsAuthenticated]
