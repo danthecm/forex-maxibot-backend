@@ -2,6 +2,7 @@ cryptography==38.0.4
 Django==4.1.4
 django-cors-headers==3.13.0
 djangorestframework==3.14.0
+djangorestframework-api-key   2.2.0
 djangorestframework-simplejwt==5.2.2
 drf-yasg==1.21.4
 psycopg2-binary==2.9.5
