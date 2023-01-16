@@ -27,4 +27,8 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
+        export EMAIL_HOST_USER="test@gmail.com"
+        export EMAIL_HOST_PASSWORD="test"
+        export POSTGRES_USER="user"
+        export POSTGRES_PASSWORD="password"
         python manage.py test
