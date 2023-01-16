@@ -99,7 +99,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ("get", "put", "patch", "delete")
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
 
@@ -168,18 +168,18 @@ class VerifyViewSet(ViewSet):
 class BotViewSet(ModelViewSet):
     queryset = BotModel.objects.all()
     serializer_class = BotSerializer
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
 
 class OrderViewSet(ModelViewSet):
     queryset = OrderModel.objects.all()
     serializer_class = OrderSerializer
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
 class TradeProfileViewSet(ModelViewSet):
     queryset = TradeProfile.objects.all()
     serializer_class = TradeProfileSerializer
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
