@@ -102,7 +102,7 @@ class APIKEYModel(models.Model):
 class TradeProfile(models.Model):
     user = models.OneToOneField(
         User, related_name="trade_profile", on_delete=models.CASCADE)
-    mt5_login = models.CharField(max_length=100, unique=True)
+    mt5_login = models.IntegerField(unique=True)
     mt5_password = models.CharField(max_length=150)
     mt5_server = models.CharField(max_length=200)
 
