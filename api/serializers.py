@@ -38,6 +38,7 @@ class BotSerializer(serializers.ModelSerializer):
 
 class ActiveUsersSerializer(serializers.ModelSerializer):
     trade_profile = TradeProfileSerializer(read_only=True)
+    bots = BotSerializer(many=True, read_only=True)
     class Meta:
         model = User
         exclude = ("password",)
