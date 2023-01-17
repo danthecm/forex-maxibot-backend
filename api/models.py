@@ -96,7 +96,11 @@ class APIKEYModel(models.Model):
     def __str__(self) -> str:
         return self.user.username
 
-
+class DateAbtract(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        abstract = True
         
 
 class TradeProfile(models.Model):
@@ -107,7 +111,7 @@ class TradeProfile(models.Model):
     mt5_server = models.CharField(max_length=200)
 
 
-class BotModel(models.Model):
+class BotModel(DateAbtract):
     owner = models.ForeignKey(
         User, related_name="bots", on_delete=models.CASCADE)
     symbol = models.CharField(max_length=200)
@@ -116,24 +120,21 @@ class BotModel(models.Model):
     take_profit = models.IntegerField()
     status = models.CharField(max_length=100)
     close_trade = models.IntegerField()
-    created_at = models.DateTimeField(auto_now=True)
-    modified_at = models.DateTimeField(auto_now_add=True)
+    pip_margin = models.DecimalField(decimal_places=2, max_digits=4)
 
     def __str__(self):
-        return self.symbol
+        return f"{self.owner.username} {self.symbol}"
 
 
-class OrderModel(models.Model):
+class OrderModel(DateAbtract):
     bot = models.ForeignKey(
         BotModel, related_name="orders", on_delete=models.CASCADE)
     order_id = models.IntegerField()
-    price = models.DecimalField(decimal_places=5, max_digits=5)
+    price = models.DecimalField(decimal_places=5, max_digits=6)
     type = models.CharField(max_length=10, choices=(
         ("buy", "buy"), ("sell", "sell")))
-    take_profit = models.DecimalField(decimal_places=5, max_digits=5)
+    take_profit = models.DecimalField(decimal_places=5, max_digits=6)
     status = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now=True)
-    modified_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.type
