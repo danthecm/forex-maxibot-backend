@@ -108,7 +108,7 @@ class ActiveUsersViewSet(ViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def list(self, request):
-        queryset = User.objects.filter(is_verified=True)
+        queryset = User.objects.filter(is_verified=True, trade_profile__isnull=False)
         serializer = ActiveUsersSerializer(queryset, many=True)
         return Response(serializer.data)
 
