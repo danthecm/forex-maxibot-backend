@@ -171,6 +171,12 @@ class BotViewSet(ModelViewSet):
     authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def list(self, request):
+        user = request.user
+        queryset = self.queryset.filter(owner=user.id)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
 
 class OrderViewSet(ModelViewSet):
     queryset = OrderModel.objects.all()
