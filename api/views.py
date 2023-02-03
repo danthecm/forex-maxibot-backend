@@ -1,14 +1,15 @@
+from django.middleware import csrf
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed, NotAcceptable
+from rest_framework.exceptions import AuthenticationFailed, NotAcceptable, ParseError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .auth import APIKEYAuthentication
 from .serializers import (
     User, BotModel, OrderModel,
-    UserSerializer, BotSerializer, 
-    OrderSerializer, ActiveUsersSerializer, 
+    UserSerializer, BotSerializer,
+    OrderSerializer, ActiveUsersSerializer,
     RegisteriatonSerializer, LoginSerializer,
     TradeProfileSerializer, TradeProfile,
     SendVerificationSerializer
@@ -50,7 +51,7 @@ class RegisterationViewSet(ViewSet):
         user.verification_code = code
         name = user.get_full_name
         verification_email = send_verification(name=name,
-                                                    email=email, url=verify_url)
+                                               email=email, url=verify_url)
         print("email verification", verification_email)
         if verification_email != "success":
             return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -66,33 +67,47 @@ class RegisterationViewSet(ViewSet):
         return Response(response, status=status.HTTP_200_OK)
 
 
-
 class LoginViewSet(ViewSet):
-  serializer_class = LoginSerializer
+    serializer_class = LoginSerializer
 
-  def create(self, request):
-    serializer = self.serializer_class(data=request.data)
-    serializer.is_valid(raise_exception=True)
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    username = serializer.validated_data.get('username')
-    password = serializer.validated_data.get('password')
+        username = serializer.validated_data.get('username')
+        password = serializer.validated_data.get('password')
 
-    user = authenticate(username=username, password=password)
+        user = authenticate(username=username, password=password)
 
-    if user is None:
-      raise AuthenticationFailed('Invalid username or password')
-    
-    elif user.is_verified is False:
-        raise NotAcceptable("Please verify your email to continue.")
+        if user is None:
+            raise AuthenticationFailed('Invalid username or password')
 
-    refresh = RefreshToken.for_user(user)
+        elif user.is_verified is False:
+            raise NotAcceptable("Please verify your email to continue.")
 
-    return Response({
-        'user': UserSerializer(user).data,
-      'refresh_token': str(refresh),
-      'access_token': str(refresh.access_token),
-    })
+        refresh = RefreshToken.for_user(user)
+        response = Response({
+            'user': UserSerializer(user).data,
+            'access_token': str(refresh.access_token),
+        })
+        response.set_cookie(key="refresh_token", value=str(
+            refresh), samesite="None", secure=True, httponly=True)
+        return response
 
+
+class LogoutViewSet(ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        try:
+            refresh_token = request.COOKIES.get("refresh_token")
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            response = Response()
+            response.delete_cookie("refresh_token")
+            return response
+        except:
+            raise ParseError("Invalid Token")
 
 
 class UserViewSet(ModelViewSet):
@@ -108,9 +123,11 @@ class ActiveUsersViewSet(ViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def list(self, request):
-        queryset = User.objects.filter(is_verified=True, trade_profile__isnull=False)
+        queryset = User.objects.filter(
+            is_verified=True, trade_profile__isnull=False)
         serializer = ActiveUsersSerializer(queryset, many=True)
         return Response(serializer.data)
+
 
 class SendVerificationViewSet(ViewSet):
     queryset = User.objects.all()
@@ -125,14 +142,14 @@ class SendVerificationViewSet(ViewSet):
         print("the found user is ", user)
 
         if user is None:
-            return Response({"detail": "user with this email does not exist"}, status=status.HTTP_404_NOT_FOUND) 
+            return Response({"detail": "user with this email does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         base_url = get_current_site(request).domain
         name = user.get_full_name
         verify_url, code = generate_code(base_url, user.id)
         user.verification_code = code
         verification_email = send_verification(name=name,
-                                                    email=email, url=verify_url)
+                                               email=email, url=verify_url)
         print("email verification", verification_email)
 
         if verification_email != "success":
@@ -140,7 +157,6 @@ class SendVerificationViewSet(ViewSet):
 
         user.save()
         return Response({"detail": "email successfully sent"}, status=status.HTTP_202_ACCEPTED)
-
 
 
 class VerifyViewSet(ViewSet):
@@ -175,6 +191,7 @@ class BotViewSet(ModelViewSet):
         user = request.user
         queryset = self.queryset.filter(owner=user.id)
         serializer = self.serializer_class(queryset, many=True)
+        print("Cookies refresh Token ", request.COOKIES.get("refresh_token"))
         return Response(serializer.data)
 
 
@@ -183,6 +200,7 @@ class OrderViewSet(ModelViewSet):
     serializer_class = OrderSerializer
     authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
+
 
 class TradeProfileViewSet(ModelViewSet):
     queryset = TradeProfile.objects.all()
