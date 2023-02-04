@@ -1,13 +1,17 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, BotViewSet, OrderViewSet, ActiveUsersViewSet, VerifyViewSet, RegisterationViewSet, LoginViewSet, TradeProfileViewSet, SendVerificationViewSet
+from .views import (UserViewSet, BotViewSet, OrderViewSet, ActiveUsersViewSet, VerifyViewSet,
+                    RegisterationViewSet, LoginViewSet, TradeProfileViewSet, SendVerificationViewSet, LogoutViewSet, TokenRefreshViewSet)
 
 my_router = DefaultRouter()
 my_router.register("user", UserViewSet, "user")
 my_router.register(r"verify", VerifyViewSet, basename="verify")
-my_router.register("send_verification", SendVerificationViewSet, basename="send_verification")
+my_router.register("send_verification", SendVerificationViewSet,
+                   basename="send_verification")
 my_router.register("register", RegisterationViewSet, basename="register")
 my_router.register('login', LoginViewSet, basename='login')
+my_router.register('logout', LogoutViewSet, basename='login')
+my_router.register("refresh", TokenRefreshViewSet, basename="refresh")
 my_router.register("trade_profile", TradeProfileViewSet,
                    basename='trade_profile')
 my_router.register("bot", BotViewSet, "bot")

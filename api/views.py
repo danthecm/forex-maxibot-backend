@@ -3,8 +3,12 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed, NotAcceptable, ParseError
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from datetime import datetime
+
 from .auth import APIKEYAuthentication
 from .serializers import (
     User, BotModel, OrderModel,
@@ -84,8 +88,9 @@ class LoginViewSet(ViewSet):
 
         elif user.is_verified is False:
             raise NotAcceptable("Please verify your email to continue.")
-
         refresh = RefreshToken.for_user(user)
+        user.last_login = datetime.now()
+        user.save()
         response = Response({
             'user': UserSerializer(user).data,
             'access_token': str(refresh.access_token),
@@ -96,17 +101,37 @@ class LoginViewSet(ViewSet):
 
 
 class LogoutViewSet(ViewSet):
-    permission_classes = [IsAuthenticated]
+    http_method_names = ["post"]
 
     def create(self, request):
         try:
             refresh_token = request.COOKIES.get("refresh_token")
-            token = RefreshToken(refresh_token)
+            if not refresh_token:
+                raise Exception
+            token = RefreshToken(token=refresh_token)
             token.blacklist()
-            response = Response()
+            response = Response("Successfully logged out")
             response.delete_cookie("refresh_token")
             return response
         except:
+            raise ParseError("Invalid token")
+
+
+class TokenRefreshViewSet(ViewSet, TokenRefreshView):
+    http_method_names = ["post"]
+
+    def create(self, request):
+        try:
+            refresh_token = request.COOKIES.get("refresh_token")
+            if not refresh_token:
+                raise Exception
+            token = RefreshToken(token=refresh_token)
+            response = Response({
+                "access_token": str(token.access_token)
+            })
+            return response
+        except Exception as e:
+            print("There was an error", e)
             raise ParseError("Invalid Token")
 
 
