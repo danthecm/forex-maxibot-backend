@@ -119,9 +119,9 @@ class LogoutViewSet(ViewSet):
 
 
 class TokenRefreshViewSet(ViewSet, TokenRefreshView):
-    http_method_names = ["post"]
+    http_method_names = ["get"]
 
-    def create(self, request):
+    def list(self, request):
         try:
             refresh_token = request.COOKIES.get("refresh_token")
             if not refresh_token:
