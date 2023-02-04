@@ -1,4 +1,3 @@
-from django.middleware import csrf
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,6 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from datetime import datetime
+import pytz
 
 from .auth import APIKEYAuthentication
 from .serializers import (
@@ -77,7 +77,6 @@ class LoginViewSet(ViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         username = serializer.validated_data.get('username')
         password = serializer.validated_data.get('password')
 
@@ -89,7 +88,7 @@ class LoginViewSet(ViewSet):
         elif user.is_verified is False:
             raise NotAcceptable("Please verify your email to continue.")
         refresh = RefreshToken.for_user(user)
-        user.last_login = datetime.now()
+        user.last_login = datetime.now(pytz.utc)
         user.save()
         response = Response({
             'user': UserSerializer(user).data,
@@ -101,19 +100,21 @@ class LoginViewSet(ViewSet):
 
 
 class LogoutViewSet(ViewSet):
-    http_method_names = ["post"]
+    http_method_names = ["get"]
 
-    def create(self, request):
+    def list(self, request):
         try:
             refresh_token = request.COOKIES.get("refresh_token")
             if not refresh_token:
+                print("No token was sent", refresh_token)
                 raise Exception
             token = RefreshToken(token=refresh_token)
             token.blacklist()
-            response = Response("Successfully logged out")
+            response = Response({"detail": "Successfully logged out"})
             response.delete_cookie("refresh_token")
             return response
-        except:
+        except Exception as e:
+            print(e)
             raise ParseError("Invalid token")
 
 
@@ -216,7 +217,7 @@ class BotViewSet(ModelViewSet):
         user = request.user
         queryset = self.queryset.filter(owner=user.id)
         serializer = self.serializer_class(queryset, many=True)
-        print("Cookies refresh Token ", request.COOKIES.get("refresh_token"))
+        # print("Cookies refresh Token ", request.COOKIES.get("refresh_token"))
         return Response(serializer.data)
 
 
