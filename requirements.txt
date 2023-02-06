@@ -8,4 +8,3 @@ drf-yasg==1.21.4
 psycopg2-binary==2.9.5
 python-decouple==3.6
 PyJWT==2.6.0
-sendgrid==6.9.7
