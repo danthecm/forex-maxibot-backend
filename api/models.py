@@ -84,7 +84,7 @@ class APIKEYModel(models.Model):
         api_key.key = harsed_key
         api_key.save()
         return raw_key
-    
+
     @classmethod
     def verify(cls, raw_key):
         all_keys = cls.objects.all()
@@ -96,12 +96,14 @@ class APIKEYModel(models.Model):
     def __str__(self) -> str:
         return self.user.username
 
+
 class DateAbtract(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     modified_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         abstract = True
-        
+
 
 class TradeProfile(models.Model):
     user = models.OneToOneField(
@@ -121,6 +123,8 @@ class BotModel(DateAbtract):
     status = models.CharField(max_length=100)
     close_trade = models.IntegerField()
     pip_margin = models.DecimalField(decimal_places=2, max_digits=4)
+    side = models.CharField(max_length=5, choices=(
+        ("buy", "buy"), ("sell", "sell"), ("all", "all")), default="all")
 
     def __str__(self):
         return f"{self.owner.username} {self.symbol}"
