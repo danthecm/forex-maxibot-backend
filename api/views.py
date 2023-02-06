@@ -217,7 +217,6 @@ class BotViewSet(ModelViewSet):
         user = request.user
         queryset = self.queryset.filter(owner=user.id)
         serializer = self.serializer_class(queryset, many=True)
-        # print("Cookies refresh Token ", request.COOKIES.get("refresh_token"))
         return Response(serializer.data)
 
 
