@@ -193,7 +193,7 @@ class VerifyViewSet(ViewSet):
         code = request.query_params.get("code")
         if code is None:
             return Response({"message": "You must send a code parameter in your request"}, status=status.HTTP_400_BAD_REQUEST)
-        user = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(self.queryset, username=pk)
         if user.is_verified:
             return Response({"message": "Email Already Verified"}, status=status.HTTP_200_OK)
         code = int(code)
