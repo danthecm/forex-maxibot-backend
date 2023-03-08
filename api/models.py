@@ -140,7 +140,7 @@ class OrderModel(DateAbtract):
     order_id = models.IntegerField()
     price = models.DecimalField(decimal_places=5, max_digits=10)
     type = models.CharField(max_length=10, choices=(
-        ("buy", "buy"), ("sell", "sell")))
+        ("buy", "buy"), ("sell", "sell"), ("deposit", "deposit"), ("withdrawal", "withdrawal")))
     take_profit = models.DecimalField(decimal_places=5, max_digits=10)
     status = models.CharField(max_length=100)
 
