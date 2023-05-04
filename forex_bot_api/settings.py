@@ -24,20 +24,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&vmr@!*8@j6z$7jf@#r3pd)oz!y)(vud*m4$g$x@bu8zqljg+7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://forex-themaxibot.netlify.app"
+    "https://forex-themaxibot.netlify.app",
+    "https://forex.themaxibot.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://forex-themaxibot.netlify.app"
+    "https://forex-themaxibot.netlify.app",
+    "https://forex.themaxibot.com"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
