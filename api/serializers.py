@@ -32,7 +32,6 @@ class BotSerializer(serializers.ModelSerializer):
 
 
 class TradeProfileSerializer(serializers.ModelSerializer):
-    bots = BotSerializer(many=True, read_only=True)
 
     class Meta:
         model = TradeProfile
@@ -47,8 +46,16 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ("password", "is_staff", "is_superuser", "verification_code")
 
 
+class TradeProfileAllSerializer(serializers.ModelSerializer):
+    bots = BotSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = TradeProfile
+        fields = "__all__"
+
+
 class ActiveUsersSerializer(serializers.ModelSerializer):
-    trade_profile = TradeProfileSerializer(read_only=True, many=True)
+    trade_profile = TradeProfileAllSerializer(read_only=True, many=True)
 
     class Meta:
         model = User
@@ -61,6 +68,7 @@ class VerifySerializer(serializers.Serializer):
 
 class ApiKeySerializer(serializers.ModelSerializer):
     user_id = serializers.CharField()
+
     class Meta:
         model = ApiKeyModel
         fields = ("user_id", "name")
