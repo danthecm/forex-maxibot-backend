@@ -43,6 +43,7 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=100, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     verification_code = models.PositiveIntegerField(null=True, blank=True)
+    country = models.CharField(max_length=255, null=True, blank=True)
 
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -52,8 +53,6 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "username"
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["email", "password"]
-
-    # Required methods
 
     @property
     def get_full_name(self):
@@ -70,32 +69,29 @@ class User(AbstractBaseUser):
         return True
 
 
-class APIKEYModel(models.Model):
-    user = models.OneToOneField(
-        User, related_name="api_key", on_delete=models.CASCADE)
-    key = models.CharField(max_length=225)
+class ApiKeyModel(models.Model):
+    user = models.ForeignKey(
+        User, related_name="api_keys", on_delete=models.CASCADE)
+    key = models.CharField(max_length=225,)
     name = models.CharField(max_length=100, null=True, blank=True)
 
-    @classmethod
-    def create(cls, **kwargs) -> None:
-        print("Create method called")
-        raw_key, harsed_key = generate_api_key()
-        kwargs["user"] = User.objects.filter(id=14).first()
-        api_key = cls(**kwargs)
-        api_key.key = harsed_key
-        api_key.save()
+    def save(self, *args, **kwargs) -> None:
+        if not self.pk:
+            raw_key, harsed_key = generate_api_key()
+            self.key = harsed_key
+        super().save(*args, **kwargs)
         return raw_key
 
     @classmethod
     def verify(cls, raw_key):
-        all_keys = cls.objects.all()
-        for api_key in all_keys:
+        api_keys = cls.objects.all()
+        for api_key in api_keys:
             if verify_api_key(raw_key, api_key.key):
                 return api_key
         return None
 
     def __str__(self) -> str:
-        return self.user.username
+        return f"{self.user.username} {self.name}"
 
 
 class DateAbtract(models.Model):
@@ -107,7 +103,7 @@ class DateAbtract(models.Model):
 
 
 class TradeProfile(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         User, related_name="trade_profile", on_delete=models.CASCADE)
     mt5_login = models.IntegerField(unique=True)
     mt5_password = models.CharField(max_length=150)
@@ -115,8 +111,8 @@ class TradeProfile(models.Model):
 
 
 class BotModel(DateAbtract):
-    owner = models.ForeignKey(
-        User, related_name="bots", on_delete=models.CASCADE)
+    profile = models.ForeignKey(
+        TradeProfile, related_name="bots", on_delete=models.CASCADE)
     symbol = models.CharField(max_length=200)
     volume = models.DecimalField(decimal_places=2, max_digits=4)
     grid_interval = models.IntegerField()
