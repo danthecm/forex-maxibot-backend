@@ -12,7 +12,7 @@ def mail_sender(subject, recipient_list, message, html_message):
             )
         return "success"
     except Exception as e:
-        print(e)
+        print("Error Sending Mail", e)
         return "Failed"
 
 def send_verification(name, email, url):
