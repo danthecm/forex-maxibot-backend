@@ -220,6 +220,12 @@ class BotViewSet(ModelViewSet):
             queryset = queryset.filter(profile__user=self.request.user)
         return queryset.all()
 
+    def list(self, request):
+        user = request.user
+        queryset = self.queryset.filter(profile__user=user)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class OrderViewSet(ModelViewSet):
     queryset = OrderModel.objects.all()
