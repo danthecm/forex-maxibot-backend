@@ -118,7 +118,7 @@ class BotModel(DateAbtract):
     grid_interval = models.IntegerField()
     take_profit = models.IntegerField()
     status = models.CharField(max_length=100)
-    close_trade = models.IntegerField()
+    close_trade = models.IntegerField(null=True, blank=True)
     pip_margin = models.DecimalField(decimal_places=2, max_digits=4)
     side = models.CharField(max_length=5, choices=(
         ("buy", "buy"), ("sell", "sell"), ("all", "all")), default="all")
