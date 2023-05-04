@@ -16,16 +16,17 @@ from .serializers import (
     OrderSerializer, ActiveUsersSerializer,
     RegisteriatonSerializer, LoginSerializer,
     TradeProfileSerializer, TradeProfile,
-    SendVerificationSerializer
+    SendVerificationSerializer,
+    ApiKeyModel, ApiKeySerializer
 )
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from helpers.send_mail import send_verification
 from helpers.verification import generate_code
+from helpers.api_key import generate_api_key
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import InvalidToken
 from django.contrib.auth import authenticate
-
 # Create your views here.
 
 
@@ -60,7 +61,6 @@ class RegisterationViewSet(ViewSet):
         if verification_email != "success":
             return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         user.save()
-        print(f"HEllo {email} Your verification_code is: ", code)
         refresh_token = RefreshToken.for_user(user)
         access_token = refresh_token.access_token
         response = {
@@ -165,7 +165,6 @@ class SendVerificationViewSet(ViewSet):
 
         email = serializer.validated_data.get("email")
         user = get_object_or_404(self.queryset, email=email)
-        print("the found user is ", user)
 
         if user is None:
             return Response({"detail": "user with this email does not exist"}, status=status.HTTP_404_NOT_FOUND)
@@ -193,7 +192,7 @@ class VerifyViewSet(ViewSet):
         code = request.query_params.get("code")
         if code is None:
             return Response({"message": "You must send a code parameter in your request"}, status=status.HTTP_400_BAD_REQUEST)
-        user = get_object_or_404(self.queryset, username=pk)
+        user = get_object_or_404(self.queryset, id=pk)
         if user.is_verified:
             return Response({"message": "Email Already Verified"}, status=status.HTTP_200_OK)
         code = int(code)
@@ -213,11 +212,12 @@ class BotViewSet(ModelViewSet):
     authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def list(self, request):
-        user = request.user
-        queryset = self.queryset.filter(owner=user.id)
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+        if not user.is_staff:
+            queryset = queryset.filter(profile__user=self.request.user)
+        return queryset.all()
 
 
 class OrderViewSet(ModelViewSet):
@@ -226,9 +226,37 @@ class OrderViewSet(ModelViewSet):
     authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+        if not user.is_staff:
+            queryset = queryset.filter(bot__profile__user=self.request.user)
+        return queryset.all()
+
 
 class TradeProfileViewSet(ModelViewSet):
     queryset = TradeProfile.objects.all()
     serializer_class = TradeProfileSerializer
     authentication_classes = [JWTAuthentication, APIKEYAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+        if not user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        return queryset.all()
+
+
+class ApiKeyViewSet(ModelViewSet):
+    queryset = ApiKeyModel.objects.all()
+    serializer_class = ApiKeySerializer
+    authentication_classes = [JWTAuthentication, APIKEYAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = self.queryset
+        if not user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+        return queryset.all()
