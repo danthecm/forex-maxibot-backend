@@ -24,4 +24,4 @@ def send_verification(name, email, url, code):
         <h3>Thanks for registering Please verify your email </h3> \
         <p>Copy the verification code or click the verify button to verify</p> \
         <p> Code: {code}</p> \
-        <a styles='padding: 1rem; color: #fff; background-color: #27ae60; border: none; border-radius: 7px;' href='{url}'>Verify</a>")
+        <a style='padding: 1rem; color: #fff; background-color: #27ae60; border: none; border-radius: 7px; text-decoration: none;' href='{url}'>Verify</a>")
