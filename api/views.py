@@ -52,12 +52,11 @@ class RegisterationViewSet(ViewSet):
         )
         user.set_password(password)
         base_url = get_current_site(request).domain
-        verify_url, code = generate_code(base_url, user.id)
+        verify_url, code = generate_code(base_url, user.username)
         user.verification_code = code
         name = user.get_full_name
-        verification_email = send_verification(name=name,
-                                               email=email, url=verify_url)
-        print("email verification", verification_email)
+        verification_email = send_verification(
+            name=name, email=email, url=verify_url, code=code)
         if verification_email != "success":
             return Response({"message": "An error occured while registering please try later"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
         user.save()
@@ -172,10 +171,10 @@ class SendVerificationViewSet(ViewSet):
 
         base_url = get_current_site(request).domain
         name = user.get_full_name
-        verify_url, code = generate_code(base_url, user.id)
+        verify_url, code = generate_code(base_url, user.username)
         user.verification_code = code
-        verification_email = send_verification(name=name,
-                                               email=email, url=verify_url)
+        verification_email = send_verification(
+            name=name, email=email, url=verify_url, code=code)
         print("email verification", verification_email)
 
         if verification_email != "success":
@@ -193,7 +192,7 @@ class VerifyViewSet(ViewSet):
         code = request.query_params.get("code")
         if code is None:
             return Response({"message": "You must send a code parameter in your request"}, status=status.HTTP_400_BAD_REQUEST)
-        user = get_object_or_404(self.queryset, id=pk)
+        user = get_object_or_404(self.queryset, username=pk)
         if user.is_verified:
             return Response({"message": "Email Already Verified"}, status=status.HTTP_200_OK)
         code = int(code)
