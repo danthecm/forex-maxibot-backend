@@ -196,7 +196,9 @@ class VerifyViewSet(ViewSet):
             return Response({"message": "You must send a code parameter in your request"}, status=status.HTTP_400_BAD_REQUEST)
         user = get_object_or_404(self.queryset, username=pk)
         if user.is_verified:
-            return Response({"message": "Email Already Verified"}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_302_FOUND, headers={
+                'Location': config("FRONTEND_URL"),
+            })
         code = int(code)
         verification_code = user.verification_code
         if code == verification_code:
