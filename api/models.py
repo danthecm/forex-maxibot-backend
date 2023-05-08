@@ -131,7 +131,7 @@ class BotModel(DateAbtract):
         decimal_places=4, max_digits=20, default=0.5)
 
     def __str__(self):
-        return f"{self.owner.username} {self.symbol}"
+        return f"{self.profile.mt5_server} {self.symbol}"
 
 
 class OrderModel(DateAbtract):
