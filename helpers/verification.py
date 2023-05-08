@@ -2,7 +2,7 @@ import random
 import string
 
 
-def generate_code(base_url, user_id):
+def generate_code(base_url, username):
     code = ''.join(random.choices(string.digits, k=6))
-    verify_url = f"http://{base_url}/verify/{user_id}/?code={code}"
+    verify_url = f"https://{base_url}/verify/{username}/?code={code}"
     return verify_url, code
