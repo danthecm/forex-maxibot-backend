@@ -69,6 +69,14 @@ class User(AbstractBaseUser):
         return True
 
 
+class DateAbtract(models.Model):
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+
 class ApiKeyModel(models.Model):
     user = models.ForeignKey(
         User, related_name="api_keys", on_delete=models.CASCADE)
@@ -92,14 +100,6 @@ class ApiKeyModel(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} {self.name}"
-
-
-class DateAbtract(models.Model):
-    created_at = models.DateTimeField(auto_now=True)
-    modified_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        abstract = True
 
 
 class TradeProfile(DateAbtract):
