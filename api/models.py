@@ -102,12 +102,15 @@ class DateAbtract(models.Model):
         abstract = True
 
 
-class TradeProfile(models.Model):
+class TradeProfile(DateAbtract):
     user = models.ForeignKey(
         User, related_name="trade_profile", on_delete=models.CASCADE)
     mt5_login = models.IntegerField(unique=True)
     mt5_password = models.CharField(max_length=150)
     mt5_server = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"{self.user.username} {self.mt5_server}"
 
 
 class BotModel(DateAbtract):
