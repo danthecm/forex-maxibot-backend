@@ -31,5 +31,6 @@ jobs:
         export EMAIL_HOST_PASSWORD="test"
         export POSTGRES_USER="user"
         export POSTGRES_PASSWORD="password"
+        export FRONTEND_URL="https://frontend.com"
         export DEBUG=False
         python manage.py test

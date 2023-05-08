@@ -7,7 +7,9 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from datetime import datetime
+from decouple import config
 import pytz
+
 
 from .auth import APIKEYAuthentication
 from .serializers import (
@@ -200,7 +202,9 @@ class VerifyViewSet(ViewSet):
         if code == verification_code:
             user.is_verified = True
             user.save()
-            return Response({"message": "Email Verified Successfully"}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_302_FOUND, headers={
+                'Location': config("FRONTEND_URL"),
+            })
 
         return Response({"message": "Invalid Verification Code"}, status=status.HTTP_400_BAD_REQUEST)
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
