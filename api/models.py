@@ -87,6 +87,7 @@ class ApiKeyModel(models.Model):
         if not self.pk:
             raw_key, harsed_key = generate_api_key()
             self.key = harsed_key
+            print("API KEY: ", raw_key)
         super().save(*args, **kwargs)
         return raw_key
 
@@ -132,6 +133,8 @@ class BotModel(DateAbtract):
         decimal_places=4, max_digits=20, default=50)
     min_combo = models.DecimalField(
         decimal_places=4, max_digits=20, default=0.5)
+    use_half_int = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"{self.profile.mt5_server} {self.symbol}"
