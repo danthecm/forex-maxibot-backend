@@ -152,7 +152,7 @@ class ActiveUsersViewSet(ViewSet):
     def list(self, request):
         queryset = User.objects.filter(
             is_verified=True, trade_profile__isnull=False,
-            trade_profile__bots__status="running")
+            trade_profile__bots__status__icontains="running")
         serializer = ActiveUsersSerializer(queryset, many=True)
         return Response(serializer.data)
 
