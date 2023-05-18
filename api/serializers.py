@@ -47,11 +47,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class TradeProfileAllSerializer(serializers.ModelSerializer):
-    bots = BotSerializer(many=True, read_only=True)
+    bots = serializers.SerializerMethodField()
 
     class Meta:
         model = TradeProfile
         fields = "__all__"
+
+    def get_bots(self, trade_profile):
+        running_bots = trade_profile.bots.filter(status__icontains='running')
+        serialized_bots = BotSerializer(running_bots, many=True)
+        return serialized_bots.data
 
 
 class ActiveUsersSerializer(serializers.ModelSerializer):
