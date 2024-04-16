@@ -134,6 +134,7 @@ class BotModel(DateAbtract):
     min_combo = models.DecimalField(
         decimal_places=4, max_digits=20, default=0.5)
     use_half_int = models.BooleanField(default=False)
+    ratio = models.DecimalField(decimal_places=0, max_digits=3, default=0)
 
 
     def __str__(self):
