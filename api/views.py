@@ -88,6 +88,9 @@ class LoginViewSet(ViewSet):
 
         elif user.is_verified is False:
             raise NotAcceptable("Please verify your email to continue.")
+        elif user.is_active is False:
+            raise NotAcceptable(
+                "Your account has been deactivated. Please contact support.")
         refresh = RefreshToken.for_user(user)
         user.last_login = datetime.now(pytz.utc)
         user.save()
